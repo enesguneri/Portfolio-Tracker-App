@@ -3,7 +3,9 @@ A modern Android application built with Kotlin that allows users to track real-t
 
   Features
 -Real-time tracking of top 100 cryptocurrencies by market cap
+
 -Profit/loss tracking for each coin based on user's purchase price and quantity
+
 -Live price data fetched from Binance API
 -Local caching of market data using Room Database
 -User portfolio stored securely in Firebase Firestore
