@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp"
+    android:orientation="horizontal"
+    android:gravity="start">
+
+    <ImageView
+        android:id="@+id/marketImageView"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+    </ImageView>
+
+    <TextView
+        android:id="@+id/assetID"
+        android:layout_width="57dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="20dp"
+        android:text="Asset ID"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@+id/marketImageView"
+        app:layout_constraintTop_toTopOf="@+id/marketImageView">
+
+    </TextView>
+
+
+    <TextView
+        android:id="@+id/valueText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="Current value:"
+        android:textSize="13sp"
+        app:layout_constraintStart_toStartOf="@+id/assetID"
+        app:layout_constraintTop_toBottomOf="@+id/investedAmountText">
+
+    </TextView>
+
+    <TextView
+        android:id="@+id/pnlText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="PNL:"
+        android:textSize="13sp"
+        app:layout_constraintStart_toStartOf="@+id/valueText"
+        app:layout_constraintTop_toBottomOf="@+id/valueText">
+
+    </TextView>
+
+    <TextView
+        android:id="@+id/amountText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="Amount:"
+        android:textSize="15sp"
+        app:layout_constraintStart_toStartOf="@+id/assetID"
+        app:layout_constraintTop_toBottomOf="@+id/assetID" />
+
+    <TextView
+        android:id="@+id/assetPriceText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="40dp"
+        android:text="Price"
+        app:layout_constraintStart_toEndOf="@+id/assetID"
+        app:layout_constraintTop_toTopOf="@+id/assetID" />
+
+    <TextView
+        android:id="@+id/investedAmountText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="Invested amount:"
+        app:layout_constraintStart_toStartOf="@+id/amountText"
+        app:layout_constraintTop_toBottomOf="@+id/amountText" />
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+    android:id="@+id/swipeRefreshLayout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".view.AssetDetailFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".view.AssetDetailFragment">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="50dp"
+        android:src="@drawable/ic_launcher_background"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/assetIDText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Bitcoin"
+            android:textSize="20sp"
+            app:layout_constraintStart_toStartOf="@+id/imageView"
+            app:layout_constraintTop_toBottomOf="@+id/imageView" />
+
+        <TextView
+            android:id="@+id/marketRankText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Rank"
+            android:textSize="20sp"
+            app:layout_constraintStart_toStartOf="@+id/assetIDText"
+            app:layout_constraintTop_toBottomOf="@+id/assetIDText" />
+
+        <TextView
+            android:id="@+id/fdvText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="FDV"
+            android:textSize="20sp"
+            app:layout_constraintStart_toStartOf="@+id/marketRankText"
+            app:layout_constraintTop_toBottomOf="@+id/marketRankText" />
+
+        <TextView
+            android:id="@+id/priceText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Price"
+            android:textSize="20sp"
+            app:layout_constraintStart_toStartOf="@+id/fdvText"
+            app:layout_constraintTop_toBottomOf="@+id/fdvText" />
+
+        <TextView
+            android:id="@+id/athText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ATH"
+            android:textSize="20sp"
+            app:layout_constraintStart_toStartOf="@+id/priceText"
+            app:layout_constraintTop_toBottomOf="@+id/priceText" />
+
+        <TextView
+            android:id="@+id/athDateText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ATH DATE"
+            android:textSize="20sp"
+            app:layout_constraintStart_toStartOf="@+id/athText"
+            app:layout_constraintTop_toBottomOf="@+id/athText" />
+
+        <Button
+            android:id="@+id/addFavoriteButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="80dp"
+            android:text="Add to Favorites"
+            app:layout_constraintStart_toStartOf="@+id/athDateText"
+            app:layout_constraintTop_toBottomOf="@+id/athDateText" />
+
+        <Button
+            android:id="@+id/deleteFavoriteButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="80dp"
+            android:text="Delete from Favorites"
+            app:layout_constraintStart_toStartOf="@+id/athDateText"
+            app:layout_constraintTop_toBottomOf="@+id/athDateText" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/loginFragment">
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.ilk.portfoliotracker.view.LoginFragment"
+        android:label="fragment_login"
+        tools:layout="@layout/fragment_login" >
+        <action
+            android:id="@+id/action_loginFragment_to_registerFragment"
+            app:destination="@id/registerFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_marketFragment"
+            app:destination="@id/marketFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_portfolioFragment"
+            app:destination="@id/portfolioFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="com.ilk.portfoliotracker.view.RegisterFragment"
+        android:label="fragment_register"
+        tools:layout="@layout/fragment_register" >
+        <action
+            android:id="@+id/action_registerFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/marketFragment"
+        android:name="com.ilk.portfoliotracker.view.MarketFragment"
+        android:label="fragment_market"
+        tools:layout="@layout/fragment_market" >
+        <action
+            android:id="@+id/action_marketFragment_to_portfolioFragment"
+            app:destination="@id/portfolioFragment" />
+        <action
+            android:id="@+id/action_marketFragment_to_settingsFragment2"
+            app:destination="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_marketFragment_to_assetDetailFragment"
+            app:destination="@id/assetDetailFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/portfolioFragment"
+        android:name="com.ilk.portfoliotracker.view.PortfolioFragment"
+        android:label="fragment_portfolio"
+        tools:layout="@layout/fragment_portfolio" >
+        <action
+            android:id="@+id/action_portfolioFragment_to_marketFragment"
+            app:destination="@id/marketFragment" />
+        <action
+            android:id="@+id/action_portfolioFragment_to_settingsFragment2"
+            app:destination="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_portfolioFragment_to_addTokenFragment"
+            app:destination="@id/addTokenFragment" />
+        <action
+            android:id="@+id/action_portfolioFragment_to_myAssetFragment"
+            app:destination="@id/myAssetFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.ilk.portfoliotracker.view.SettingsFragment"
+        android:label="fragment_settings"
+        tools:layout="@layout/fragment_settings" >
+        <action
+            android:id="@+id/action_settingsFragment2_to_marketFragment"
+            app:destination="@id/marketFragment" />
+        <action
+            android:id="@+id/action_settingsFragment2_to_portfolioFragment"
+            app:destination="@id/portfolioFragment" />
+        <action
+            android:id="@+id/action_settingsFragment_to_portfolioFragment"
+            app:destination="@id/portfolioFragment" />
+        <action
+            android:id="@+id/action_settingsFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/assetDetailFragment"
+        android:name="com.ilk.portfoliotracker.view.AssetDetailFragment"
+        android:label="fragment_asset_detail"
+        tools:layout="@layout/fragment_asset_detail" >
+        <argument
+            android:name="marketCapRank"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_assetDetailFragment_to_marketFragment"
+            app:destination="@id/marketFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/addTokenFragment"
+        android:name="com.ilk.portfoliotracker.view.AddTokenFragment"
+        android:label="fragment_add_token"
+        tools:layout="@layout/fragment_add_token" >
+        <action
+            android:id="@+id/action_addTokenFragment_to_portfolioFragment"
+            app:destination="@id/portfolioFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/myAssetFragment"
+        android:name="com.ilk.portfoliotracker.view.MyAssetFragment"
+        android:label="fragment_my_asset"
+        tools:layout="@layout/fragment_my_asset" >
+        <action
+            android:id="@+id/action_myAssetFragment_to_portfolioFragment"
+            app:destination="@id/portfolioFragment" />
+        <argument
+            android:name="coinName"
+            app:argType="string" />
+    </fragment>
+</navigation>
