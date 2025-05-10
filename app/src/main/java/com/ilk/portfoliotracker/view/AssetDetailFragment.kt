@@ -183,35 +183,6 @@ class AssetDetailFragment : Fragment() {
     }
 
 
-    /*private fun isAddedToFavorites(onResult: (Boolean) -> Unit) {
-        auth.currentUser?.let {
-            db.collection("CryptoDB").document(it.uid).collection("Favorites")
-                .orderBy("date", Query.Direction.ASCENDING)
-                .addSnapshotListener { value, error ->
-                    if (error != null) {
-                        Toast.makeText(requireContext(), error.localizedMessage, Toast.LENGTH_LONG).show()
-                        onResult(false)
-                    } else {
-                        var isAdded = false
-                        value?.documents?.forEach { document ->
-                            val coinID = document.get("coinID") as? Long
-                            if (coinID?.toInt() == assetID) {
-                                isAdded = true
-                            }
-                        }
-                        onResult(isAdded)
-                    }
-                }
-        } ?: onResult(false)
-    }
-
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-
-*/
     private fun observeFavorites() {
         auth.currentUser?.let { user ->
             val favoritesRef = db.collection("CryptoDB")

@@ -33,12 +33,10 @@ class MainActivity : AppCompatActivity() {
 
         auth = Firebase.auth
 
-        //BottomNavigation'dan dolayı en alttaki view gözükmüyor.
         //Market kısmına favorites eklenebilir.
-        //Splash screen ve logo güncellemesi
     }
 
-    override fun onStart() {//onCreate'e yazınca uygulama çöktüğü için onStart'a taşıdım.
+    override fun onStart() {//onCreate'e yazınca uygulama çöktüğü için onStart'a taşındı.
         super.onStart()
         val navController = findNavController(R.id.nav_host_fragment)
         binding.bottomNavigationView.setupWithNavController(navController)

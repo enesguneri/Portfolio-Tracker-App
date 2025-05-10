@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.view.doOnLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -12,13 +13,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
-
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.ilk.portfoliotracker.R
 import com.ilk.portfoliotracker.adapter.MyAssetAdapter
 import com.ilk.portfoliotracker.databinding.FragmentPortfolioBinding
 import com.ilk.portfoliotracker.model.MyAsset
@@ -90,6 +92,15 @@ class PortfolioFragment : Fragment() {
             Toast.makeText(requireContext(), e.localizedMessage, Toast.LENGTH_LONG).show()
         }
 
+        val bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+        bottomNav.doOnLayout {
+            binding.portfolioRecyclerView.setPadding(
+                binding.portfolioRecyclerView.paddingLeft,
+                binding.portfolioRecyclerView.paddingTop,
+                binding.portfolioRecyclerView.paddingRight,
+                bottomNav.height
+            )
+        }
     }
 
     private fun getDataFromFirestore(){

@@ -2,18 +2,20 @@ package com.ilk.portfoliotracker.view
 
 import android.content.Context
 import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.doOnLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.ilk.portfoliotracker.R
 import com.ilk.portfoliotracker.adapter.MarketRecyclerAdapter
 import com.ilk.portfoliotracker.databinding.FragmentMarketBinding
 import com.ilk.portfoliotracker.util.PrivateSharedPreferences
@@ -33,11 +35,6 @@ class MarketFragment : Fragment() {
 
     private lateinit var privateSharedPreferences : PrivateSharedPreferences
 
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -79,12 +76,25 @@ class MarketFragment : Fragment() {
             }
         }
 
+
+
+
+        val bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+        bottomNav.doOnLayout {
+            binding.marketRecyclerView.setPadding(
+                binding.marketRecyclerView.paddingLeft,
+                binding.marketRecyclerView.paddingTop,
+                binding.marketRecyclerView.paddingRight,
+                bottomNav.height
+            )
+        }
     }
 
     private fun isNetworkAvailable(context: Context): Boolean {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val activeNetwork = connectivityManager.activeNetworkInfo
-        return activeNetwork != null && activeNetwork.isConnected
+        val network = connectivityManager.activeNetwork
+        val capabilities = connectivityManager.getNetworkCapabilities(network)
+        return capabilities != null && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 
 

@@ -169,4 +169,18 @@ class MarketDataListViewModel(application: Application) : AndroidViewModel(appli
             }
         }
     }
+    fun isAvailableOnBinance(symbol: String): Boolean {
+        val binanceData =
+            binanceDataList.value!!
+        val uppercasedSymbol = symbol.uppercase()
+        for (j in binanceData.indices) {
+            val binanceDataSymbol = binanceData[j].symbol
+            if (binanceDataSymbol != null) {
+                if (binanceDataSymbol.startsWith(uppercasedSymbol)) {
+                    return true
+                }
+            }
+        }
+        return false
+    }
 }

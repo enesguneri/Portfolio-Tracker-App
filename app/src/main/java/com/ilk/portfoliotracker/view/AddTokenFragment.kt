@@ -56,6 +56,7 @@ class AddTokenFragment : Fragment() {
 
         viewModel.coinGeckoDataList.observe(viewLifecycleOwner){
             val adapter = ArrayAdapter(requireContext(), R.layout.simple_list_item_1, viewModel.coinGeckoDataList.value!!.map { it.name })
+            //AutoCompleteTextView içindir. Coin adı girildiğinde adla eşleşen coinlerin gösterilmesini sağlar.
             binding.assetAutoCompleteTextView.setAdapter(adapter)
             binding.assetAutoCompleteTextView.threshold = 3
         }

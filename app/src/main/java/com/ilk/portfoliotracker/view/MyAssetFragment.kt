@@ -49,16 +49,8 @@ class MyAssetFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         try {
             getDataFromFirestore()
-            assetList.forEach {
-                if (assetName == it.name){
-                    binding.assetName.setText(it.name)
-                    binding.assetAmount.setText(it.amount.toString())
-                    binding.assetCost.setText(it.cost.toString())
-                }
-            }
         } catch (e : Exception){
             Log.e("MyAssetFragment", "Error getting data from Firestore")
         }
@@ -80,11 +72,24 @@ class MyAssetFragment : Fragment() {
                                 val amount = document.get("assetAmount") as Double
                                 val cost = document.get("assetCost") as Double
                                 val name = document.get("assetName") as String
-                                val userID = auth.currentUser?.uid
+                                if (name == assetName) {
+                                    binding.assetName.text = name
+                                    binding.assetAmount.setText(amount.toString())
+                                    binding.assetCost.setText(cost.toString())
+                                }
 
-                                val myAsset = MyAsset(amount, cost, name, userID)
-                                assetList.add(myAsset)
+                                //val myAsset = MyAsset(amount, cost, name, userID)
+                                //assetList.add(myAsset)
                             }
+                            /*
+                            assetList.forEach {
+                                if (assetName == it.name){
+                                    binding.assetName.setText(it.name)
+                                    binding.assetAmount.setText(it.amount.toString())
+                                    binding.assetCost.setText(it.cost.toString())
+                                }
+                            }
+                             */
                         }
                     }
                 }
