@@ -21,7 +21,7 @@ class MarketDataListViewModel(application: Application) : AndroidViewModel(appli
     private val privateSharedPreferences = PrivateSharedPreferences(getApplication())
 
     val coinGeckoDataList = MutableLiveData<List<CoinGeckoData>>()
-    val binanceDataList = MutableLiveData<List<BinanceData>>()
+    private val binanceDataList = MutableLiveData<List<BinanceData>>()
     val dataExceptionAlert = MutableLiveData<Boolean>()
     val dataLoading = MutableLiveData<Boolean>()
     private var dataLoaded : Boolean = false
@@ -33,11 +33,18 @@ class MarketDataListViewModel(application: Application) : AndroidViewModel(appli
     private fun getDataFromAPI() {
         dataLoading.value = true
         viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val coinGeckoData =
+
+                var coinGeckoData =
                     coinGeckoAPIService.getData()//limiti aşmamak için coinGeckoAPI'dan tekrar veri çekilmez.
                 val binanceData =
                     binanceAPIService.getData()//Binance API'den sadece price bilgisi çekilir ve böylece sınırsız şekilde güncel fiyat bilgisine erişilebilir.
+
+                coinGeckoData.filter {
+                    it.symbol?.let { it1 -> isAvailableOnBinance(it1,binanceData) } == true//sadece binance'de listeli olan coinler gösterilecek şekilde filtrelenir.
+                }
+
+
+
                 for (i in coinGeckoData.indices) {
                     //İşlemleri uzatmamak için binanceApi'den alınan price verisi CoinGecko data class'ındaki price verisiyle değiştirilir.
                     //Doğru price verisini bulmak için klasik for döngüsüyle coingecko'daki sembol binance'dekiyle eşleştirilir.
@@ -45,9 +52,9 @@ class MarketDataListViewModel(application: Application) : AndroidViewModel(appli
                     if (data.symbol != null) {
                         val symbol = data.symbol.uppercase()
                         for (j in binanceData.indices) {
-                            val binanceDataSymbol = binanceData[j].symbol
-                            if (binanceDataSymbol != null) {
-                                if (binanceDataSymbol.startsWith(symbol)) {
+                            val baseAsset = binanceData[j].symbol?.removeSuffix("USDT")
+                            if (baseAsset != null) {
+                                if (baseAsset.startsWith(symbol)) {
                                     coinGeckoData[i].current_price = binanceData[j].price
                                     break
                                 }
@@ -60,17 +67,12 @@ class MarketDataListViewModel(application: Application) : AndroidViewModel(appli
                     dataExceptionAlert.value = false
                     coinGeckoDataList.value = coinGeckoData
                     binanceDataList.value = binanceData
-                    //println(data.size)
                     saveDataToRoomDB(coinGeckoData)
                 }
                 dataLoaded = true
-            }catch (e: Exception){
-                withContext(Dispatchers.Main){
-                    dataLoading.value = false
-                    dataExceptionAlert.value = true
-                }
-            }
+
         }
+        println(coinGeckoDataList.value == null)
     }
 
     fun refreshData(){
@@ -136,6 +138,11 @@ class MarketDataListViewModel(application: Application) : AndroidViewModel(appli
                         coinGeckoDataList.value!!//limiti aşmamak için coinGeckoAPI'dan tekrar veri çekilmez.
                     val binanceData =
                         binanceAPIService.getData()//Binance API'den sadece price bilgisi çekilir ve böylece sınırsız şekilde güncel fiyat bilgisine erişilebilir.
+
+                    coinGeckoData.filter {
+                        it.symbol?.let { it1 -> isAvailableOnBinance(it1,binanceData) } == true//sadece binance'de listeli olan coinler gösterilecek şekilde filtrelenir.
+                    }
+
                     for (i in coinGeckoData.indices) {
                         //İşlemleri uzatmamak için binanceApi'den alınan price verisi CoinGecko data class'ındaki price verisiyle değiştirilir.
                         //Doğru price verisini bulmak için klasik for döngüsüyle coingecko'daki sembol binance'dekiyle eşleştirilir.
@@ -143,9 +150,9 @@ class MarketDataListViewModel(application: Application) : AndroidViewModel(appli
                         if (data.symbol != null) {
                             val symbol = data.symbol.uppercase()
                             for (j in binanceData.indices) {
-                                val binanceDataSymbol = binanceData[j].symbol
-                                if (binanceDataSymbol != null) {
-                                    if (binanceDataSymbol.startsWith(symbol)) {
+                                val baseAsset = binanceData[j].symbol?.removeSuffix("USDT")
+                                if (baseAsset != null) {
+                                    if (baseAsset.startsWith(symbol)) {
                                         coinGeckoData[i].current_price = binanceData[j].price
                                         break
                                     }
@@ -169,18 +176,14 @@ class MarketDataListViewModel(application: Application) : AndroidViewModel(appli
             }
         }
     }
-    fun isAvailableOnBinance(symbol: String): Boolean {
-        val binanceData =
-            binanceDataList.value!!
+    fun isAvailableOnBinance(symbol: String, binanceDataList : List<BinanceData>): Boolean {
         val uppercasedSymbol = symbol.uppercase()
-        for (j in binanceData.indices) {
-            val binanceDataSymbol = binanceData[j].symbol
-            if (binanceDataSymbol != null) {
-                if (binanceDataSymbol.startsWith(uppercasedSymbol)) {
-                    return true
-                }
-            }
+
+        return binanceDataList.any {
+            val baseAsset = it.symbol?.removeSuffix("USDT")
+            baseAsset.equals(uppercasedSymbol)
         }
-        return false
+
     }
+
 }
