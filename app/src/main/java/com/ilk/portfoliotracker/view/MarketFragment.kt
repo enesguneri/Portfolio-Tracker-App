@@ -15,9 +15,16 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.ilk.portfoliotracker.R
+import com.ilk.portfoliotracker.adapter.FavoritesRecyclerAdapter
 import com.ilk.portfoliotracker.adapter.MarketRecyclerAdapter
 import com.ilk.portfoliotracker.databinding.FragmentMarketBinding
+import com.ilk.portfoliotracker.model.CoinGeckoData
 import com.ilk.portfoliotracker.util.PrivateSharedPreferences
 import com.ilk.portfoliotracker.viewmodel.MarketDataListViewModel
 import kotlinx.coroutines.delay
@@ -32,8 +39,18 @@ class MarketFragment : Fragment() {
 
     private lateinit var viewModel : MarketDataListViewModel
     private val marketRecyclerAdapter = MarketRecyclerAdapter(arrayListOf())
+    private val favoritesRecyclerAdapter = FavoritesRecyclerAdapter(arrayListOf())
 
     private lateinit var privateSharedPreferences : PrivateSharedPreferences
+
+    private lateinit var auth: FirebaseAuth
+    private lateinit var db : FirebaseFirestore
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        auth = Firebase.auth
+        db = Firebase.firestore
+    }
 
 
     override fun onCreateView(
@@ -55,12 +72,17 @@ class MarketFragment : Fragment() {
 
         binding.marketRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.marketRecyclerView.adapter = marketRecyclerAdapter
-
         observeLiveData()
 
 
+        binding.favoritesRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.favoritesRecyclerView.adapter = favoritesRecyclerAdapter
+
         binding.swipeRefreshLayout.setOnRefreshListener {
             binding.marketRecyclerView.visibility = View.GONE
+            binding.allCoinsText.visibility = View.GONE
+            binding.favoritesRecyclerView.visibility = View.GONE
+            binding.favoritesText.visibility = View.GONE
             binding.assetExceptionAlert.visibility = View.GONE
             binding.progressBar.visibility = View.VISIBLE
             viewModel.refreshDataFromAPI()
@@ -78,7 +100,6 @@ class MarketFragment : Fragment() {
 
 
 
-
         val bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         bottomNav.doOnLayout {
             binding.marketRecyclerView.setPadding(
@@ -88,6 +109,7 @@ class MarketFragment : Fragment() {
                 bottomNav.height
             )
         }
+
     }
 
     private fun isNetworkAvailable(context: Context): Boolean {
@@ -97,13 +119,50 @@ class MarketFragment : Fragment() {
         return capabilities != null && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 
+    private fun observeFavorites(coinList: List<CoinGeckoData>){
+        val favoritesList : ArrayList<CoinGeckoData> = arrayListOf()
+        auth.currentUser?.let {
+            db.collection("CryptoDB").document(it.uid).collection("Favorites").get().addOnSuccessListener { value ->
+                if (value != null) {
+                    for (document in value) {
+                        if (coinList.isNotEmpty()) {
+                            for (coin in coinList) {
+                                if (document.id == coin.name) {
+                                    favoritesList.add(coin)
+                                }
+                            }
+                        }
+                    }
+                }
+
+                favoritesRecyclerAdapter.updateFavoritesList(favoritesList)
+
+                if (favoritesList.isEmpty()) {
+                    binding.favoritesText.visibility = View.GONE
+                    binding.favoritesRecyclerView.visibility = View.GONE
+                }
+                else {
+                    binding.favoritesText.visibility = View.VISIBLE
+                    binding.favoritesRecyclerView.visibility = View.VISIBLE
+                }
+
+            }
+        }
+
+    }
 
     private fun observeLiveData() {
         viewModel.coinGeckoDataList.observe(viewLifecycleOwner) {
             marketRecyclerAdapter.updateAssetList(it)
+            observeFavorites(it)
+
             binding.shimmerLayout.stopShimmer()
             binding.shimmerLayout.visibility = View.GONE
             binding.marketRecyclerView.visibility = View.VISIBLE
+            binding.allCoinsText.visibility = View.VISIBLE
+            binding.progressBar.visibility = View.GONE
+            binding.assetExceptionAlert.visibility = View.GONE
+
         }
 
 
@@ -126,10 +185,14 @@ class MarketFragment : Fragment() {
                 binding.progressBar.visibility = View.GONE
                 binding.marketRecyclerView.visibility = View.GONE
                 binding.assetExceptionAlert.visibility = View.GONE
+                binding.allCoinsText.visibility = View.GONE
+
             } else {
                 binding.progressBar.visibility = View.GONE
             }
         }
+
+
     }
 
 

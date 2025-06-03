@@ -73,7 +73,6 @@ class MarketDataListViewModel(application: Application) : AndroidViewModel(appli
                 dataLoaded = true
 
         }
-        println(coinGeckoDataList.value == null)
     }
 
     fun refreshData(){

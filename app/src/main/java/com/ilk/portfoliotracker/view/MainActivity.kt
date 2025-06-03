@@ -34,13 +34,13 @@ class MainActivity : AppCompatActivity() {
         auth = Firebase.auth
 
         //Market kısmına favorites eklenebilir.
+        //Eklenen coinlerin yüzdesel olarak dağılımı ve toplam bakiyenin kar zarar durumu eklenebilir.
     }
 
     override fun onStart() {//onCreate'e yazınca uygulama çöktüğü için onStart'a taşındı.
         super.onStart()
         val navController = findNavController(R.id.nav_host_fragment)
         binding.bottomNavigationView.setupWithNavController(navController)
-
         navController.addOnDestinationChangedListener { _, destination, _ ->
             if (destination.id == R.id.loginFragment || destination.id == R.id.registerFragment) {
                 binding.bottomNavigationView.visibility = View.GONE
@@ -48,6 +48,8 @@ class MainActivity : AppCompatActivity() {
                 binding.bottomNavigationView.visibility = View.VISIBLE
             }
         }
+
+
     }
 
 
