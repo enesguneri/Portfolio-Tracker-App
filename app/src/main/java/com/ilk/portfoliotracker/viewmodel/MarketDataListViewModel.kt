@@ -177,17 +177,7 @@ class MarketDataListViewModel(application: Application) : AndroidViewModel(appli
             }
         }
     }
-    /*
-    fun isAvailableOnBinance(symbol: String, binanceDataList : List<BinanceData>): Boolean {
-        val uppercasedSymbol = symbol.uppercase()
 
-        return binanceDataList.any {
-            val baseAsset = it.symbol?.removeSuffix("USDT")
-            baseAsset.equals(uppercasedSymbol)
-        }
-
-    }
-    */
 
     fun isAvailableOnBinance(symbol: String, binanceData : List<BinanceData>): Boolean {
         val uppercasedSymbol = symbol.uppercase()

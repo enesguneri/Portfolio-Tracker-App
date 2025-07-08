@@ -32,23 +32,21 @@ class AssetDetailFragment : Fragment() {
 
     private lateinit var viewModel : MarketDataListViewModel
 
-    private var assetID = 0
-
+    private var coinName : String? = null
+    private var isNavigatedFromFavoritesList = false
     private lateinit var auth: FirebaseAuth
     private lateinit var db : FirebaseFirestore
+    private var isFavorite = false
 
     private var favoritesListener: ListenerRegistration? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        viewModel = ViewModelProvider(this)[MarketDataListViewModel::class.java]
-
         arguments?.let {
-            assetID = AssetDetailFragmentArgs.fromBundle(it).marketCapRank
+            coinName = AssetDetailFragmentArgs.fromBundle(it).coinName
+            isNavigatedFromFavoritesList = AssetDetailFragmentArgs.fromBundle(it).isNavigatedFromFavoritesList
         }
-
-        viewModel.refreshData()
 
         auth = Firebase.auth
         db = Firebase.firestore
@@ -65,7 +63,10 @@ class AssetDetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel = ViewModelProvider(this)[MarketDataListViewModel::class.java]
+        viewModel.refreshData()
 
+        //favoriteslistten gelene farklı marketrecyclerviewden gelene farklı davranış yapılacak.
         binding.imageView.visibility = View.GONE
         binding.assetIDText.visibility = View.GONE
         binding.priceText.visibility = View.GONE
@@ -83,21 +84,20 @@ class AssetDetailFragment : Fragment() {
             binding.swipeRefreshLayout.isRefreshing = false
         }
 
-
-
-
         binding.addFavoriteButton.setOnClickListener {
             auth.currentUser?.let {
                 val coinMap = hashMapOf<String,Any>()
-                coinMap.put("coinID",assetID)
+                coinName?.let { it1 -> coinMap.put("coinName", it1) }
                 coinMap.put("date",Timestamp.now())
-                val coinName = viewModel.coinGeckoDataList.value?.get(assetID)?.name
-                if (coinName != null) {
-                    db.collection("CryptoDB").document(it.uid).collection("Favorites").document(coinName).set(coinMap).addOnSuccessListener {
-                        binding.addFavoriteButton.visibility = View.GONE
-                        binding.deleteFavoriteButton.visibility = View.VISIBLE
-                    }.addOnFailureListener { exception ->
-                        Toast.makeText(requireContext(),exception.localizedMessage,Toast.LENGTH_LONG).show()
+                if (!isFavorite) {
+                    coinName?.let { it1 ->
+                        db.collection("CryptoDB").document(it.uid).collection("Favorites").document(it1)
+                            .set(coinMap).addOnSuccessListener {
+                            binding.addFavoriteButton.visibility = View.GONE
+                            binding.deleteFavoriteButton.visibility = View.VISIBLE
+                        }.addOnFailureListener { exception ->
+                            Toast.makeText(requireContext(),exception.localizedMessage,Toast.LENGTH_LONG).show()
+                        }
                     }
                 }
             }
@@ -105,19 +105,25 @@ class AssetDetailFragment : Fragment() {
 
         binding.deleteFavoriteButton.setOnClickListener {
             auth.currentUser?.let {
-                val coinName = viewModel.coinGeckoDataList.value?.get(assetID)?.name
-                if (coinName != null) {
-                    db.collection("CryptoDB").document(it.uid).collection("Favorites").document(coinName).delete().addOnSuccessListener {
-                        binding.addFavoriteButton.visibility = View.VISIBLE
-                        binding.deleteFavoriteButton.visibility = View.GONE
-                    }.addOnFailureListener {
-                        Log.e("Firestore","Can not delete")
+                if (isFavorite) {
+                    coinName?.let { it1 ->
+                        db.collection("CryptoDB").document(it.uid).collection("Favorites").document(
+                            it1
+                        ).delete().addOnSuccessListener {
+                            binding.addFavoriteButton.visibility = View.VISIBLE
+                            binding.deleteFavoriteButton.visibility = View.GONE
+                        }.addOnFailureListener {
+                            Log.e("Firestore","Can not delete")
+                        }
                     }
                 }
             }
         }
 
+
         observeFavorites()
+
+
 
 
     }
@@ -125,35 +131,51 @@ class AssetDetailFragment : Fragment() {
     private fun observeLiveData() {
         viewModel.coinGeckoDataList.observe(viewLifecycleOwner) {
             if (it.isNotEmpty()) {
-                binding.imageView.visibility = View.VISIBLE
-                binding.assetIDText.visibility = View.VISIBLE
-                binding.priceText.visibility = View.VISIBLE
-                binding.athText.visibility = View.VISIBLE
-                binding.athDateText.visibility = View.VISIBLE
-                binding.marketRankText.visibility = View.VISIBLE
-                binding.fdvText.visibility = View.VISIBLE
+                val assetID = getCoinID()
+                if (assetID != 999) {
+                    binding.imageView.visibility = View.VISIBLE
+                    binding.assetIDText.visibility = View.VISIBLE
+                    binding.priceText.visibility = View.VISIBLE
+                    binding.athText.visibility = View.VISIBLE
+                    binding.athDateText.visibility = View.VISIBLE
+                    binding.marketRankText.visibility = View.VISIBLE
+                    binding.fdvText.visibility = View.VISIBLE
 
 
 
-                binding.assetIDText.text = it[assetID].name
-                binding.priceText.text = "Price: ${it[assetID].current_price.toString()}"
-                binding.athText.text = "ATH:  ${it[assetID].ath.toString()}"
-                binding.athDateText.text = "ATH Date: ${formatDateTimeToDate(it[assetID].ath_date)}"
-                binding.marketRankText.text =
-                    "Market Cap Rank: #${it[assetID].market_cap_rank.toString()}"
-                binding.fdvText.text =
-                    "Fully Diluted Value: ${formatNumber(it[assetID].fully_diluted_valuation)}"
 
-                binding.imageView.downloadImage(
-                    it[assetID].image,
-                    makePlaceHolder(binding.imageView.context)
-                )
+                    binding.assetIDText.text = it[assetID].name
+                    binding.priceText.text = "Price: ${it[assetID].current_price.toString()}"
+                    binding.athText.text = "ATH:  ${it[assetID].ath.toString()}"
+                    binding.athDateText.text =
+                        "ATH Date: ${formatDateTimeToDate(it[assetID].ath_date)}"
+                    binding.marketRankText.text =
+                        "Market Cap Rank: #${it[assetID].market_cap_rank.toString()}"
+                    binding.fdvText.text =
+                        "Fully Diluted Value: ${formatNumber(it[assetID].fully_diluted_valuation)}"
+
+                    binding.imageView.downloadImage(
+                        it[assetID].image,
+                        makePlaceHolder(binding.imageView.context)
+                    )
+                }
             }
             else{
                 Log.e("API","Api error")
             }
         }
     }
+
+    private fun getCoinID() : Int{
+        val coinList = viewModel.coinGeckoDataList.value
+        coinList?.forEach {
+            if (it.symbol == coinName) {
+                return coinList.indexOf(it)
+            }
+        }
+        return 999
+    }
+
 
     fun formatDateTimeToDate(dateTime: String?): String {
         if(dateTime != null) {
@@ -199,8 +221,8 @@ class AssetDetailFragment : Fragment() {
                     return@addSnapshotListener
                 }
 
-                val isFavorite = snapshot?.documents?.any { doc ->
-                    (doc.get("coinID") as? Long)?.toInt() == assetID
+                isFavorite = snapshot?.documents?.any { doc ->
+                    (doc.get("coinName") as? String) == coinName
                 } == true
 
                 // binding güvenli çünkü sadece aktif view varsa buraya giriyoruz
@@ -214,6 +236,7 @@ class AssetDetailFragment : Fragment() {
             }
         }
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

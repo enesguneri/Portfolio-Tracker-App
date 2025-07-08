@@ -86,11 +86,15 @@
         android:label="fragment_asset_detail"
         tools:layout="@layout/fragment_asset_detail" >
         <argument
-            android:name="marketCapRank"
-            app:argType="integer" />
+            android:name="coinName"
+            app:argType="string"
+            app:nullable="true" />
         <action
             android:id="@+id/action_assetDetailFragment_to_marketFragment"
             app:destination="@id/marketFragment" />
+        <argument
+            android:name="isNavigatedFromFavoritesList"
+            app:argType="boolean" />
     </fragment>
     <fragment
         android:id="@+id/addTokenFragment"

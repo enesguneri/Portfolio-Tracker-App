@@ -12,6 +12,7 @@ import com.ilk.portfoliotracker.model.CoinGeckoData
 import com.ilk.portfoliotracker.util.downloadImage
 import com.ilk.portfoliotracker.util.makePlaceHolder
 import com.ilk.portfoliotracker.view.MarketFragmentDirections
+import androidx.navigation.findNavController
 
 class MarketRecyclerAdapter(val assetList : ArrayList<CoinGeckoData>) : RecyclerView.Adapter<MarketRecyclerAdapter.MarketViewHolder>() {
 
@@ -35,17 +36,17 @@ class MarketRecyclerAdapter(val assetList : ArrayList<CoinGeckoData>) : Recycler
     }
 
     override fun onBindViewHolder(holder: MarketViewHolder, position: Int) {
-        holder.binding.assetID.text = assetList[position].name!!
-        holder.binding.priceAnd24HChangeText.text = "${assetList[position].current_price!!}"
-        if(assetList[position].price_change_percentage_24h!! < 0)
+        holder.binding.assetID.text = assetList[position].name
+        holder.binding.priceAnd24HChangeText.text = "${assetList[position].current_price}"
+        if(assetList[position].price_change_percentage_24h != null && assetList[position].price_change_percentage_24h!! < 0) {
             holder.binding.priceChangeText.setTextColor(holder.itemView.context.resources.getColor(R.color.red))
-        else
+        } else
             holder.binding.priceChangeText.setTextColor(holder.itemView.context.resources.getColor(R.color.green))
 
-        holder.binding.priceChangeText.text = "%${String.format("%.2f",assetList[position].price_change_percentage_24h!!)}"
+        holder.binding.priceChangeText.text = "%${String.format("%.2f",assetList[position].price_change_percentage_24h)}"
         holder.binding.marketImageView.downloadImage(assetList[position].image, makePlaceHolder(holder.itemView.context))
         holder.itemView.setOnClickListener {
-            val action = MarketFragmentDirections.actionMarketFragmentToAssetDetailFragment(position)
+            val action = MarketFragmentDirections.actionMarketFragmentToAssetDetailFragment(assetList[position].symbol,false)
             Navigation.findNavController(it).navigate(action)
         }
     }

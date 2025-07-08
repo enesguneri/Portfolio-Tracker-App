@@ -2,6 +2,7 @@ package com.ilk.portfoliotracker.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
 import com.ilk.portfoliotracker.R
 import com.ilk.portfoliotracker.databinding.MarketRecyclerRowBinding
@@ -40,8 +41,8 @@ class FavoritesRecyclerAdapter(val favoritesList : ArrayList<CoinGeckoData>) : R
         holder.binding.priceChangeText.text = "%${String.format("%.2f",favoritesList[position].price_change_percentage_24h!!)}"
         holder.binding.marketImageView.downloadImage(favoritesList[position].image, makePlaceHolder(holder.itemView.context))
         holder.itemView.setOnClickListener {
-            val action = MarketFragmentDirections.actionMarketFragmentToAssetDetailFragment(position)
-            it.findNavController().navigate(action)
+            val action = MarketFragmentDirections.actionMarketFragmentToAssetDetailFragment(favoritesList[position].symbol,true)
+            Navigation.findNavController(it).navigate(action)
         }
     }
 }

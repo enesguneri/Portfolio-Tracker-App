@@ -40,6 +40,7 @@ class MarketFragment : Fragment() {
     private lateinit var viewModel : MarketDataListViewModel
     private val marketRecyclerAdapter = MarketRecyclerAdapter(arrayListOf())
     private val favoritesRecyclerAdapter = FavoritesRecyclerAdapter(arrayListOf())
+    private var isFavoriteSwitchOn = false
 
     private lateinit var privateSharedPreferences : PrivateSharedPreferences
 
@@ -72,7 +73,7 @@ class MarketFragment : Fragment() {
 
         binding.marketRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.marketRecyclerView.adapter = marketRecyclerAdapter
-        observeLiveData()
+
 
 
         binding.favoritesRecyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -110,6 +111,21 @@ class MarketFragment : Fragment() {
             )
         }
 
+        binding.switchFavorites.setOnCheckedChangeListener { _, isChecked ->
+            isFavoriteSwitchOn = isChecked
+            if (isFavoriteSwitchOn) {
+                binding.favoritesRecyclerView.visibility = View.VISIBLE
+                binding.favoritesText.visibility = View.VISIBLE
+                binding.allCoinsText.visibility = View.GONE
+                binding.marketRecyclerView.visibility = View.GONE
+            } else {
+                binding.favoritesRecyclerView.visibility = View.GONE
+                binding.favoritesText.visibility = View.GONE
+                binding.allCoinsText.visibility = View.VISIBLE
+                binding.marketRecyclerView.visibility = View.VISIBLE
+            }
+        }
+        observeLiveData()
     }
 
     private fun isNetworkAvailable(context: Context): Boolean {
@@ -127,7 +143,7 @@ class MarketFragment : Fragment() {
                     for (document in value) {
                         if (coinList.isNotEmpty()) {
                             for (coin in coinList) {
-                                if (document.id == coin.name) {
+                                if (document.get("coinName") == coin.symbol) {
                                     favoritesList.add(coin)
                                 }
                             }
@@ -140,10 +156,20 @@ class MarketFragment : Fragment() {
                 if (favoritesList.isEmpty()) {
                     binding.favoritesText.visibility = View.GONE
                     binding.favoritesRecyclerView.visibility = View.GONE
+                    binding.allCoinsText.visibility = View.VISIBLE
+                    binding.marketRecyclerView.visibility = View.VISIBLE
                 }
-                else {
+                else if (isFavoriteSwitchOn) {
                     binding.favoritesText.visibility = View.VISIBLE
                     binding.favoritesRecyclerView.visibility = View.VISIBLE
+                    binding.allCoinsText.visibility = View.GONE
+                    binding.marketRecyclerView.visibility = View.GONE
+                }
+                else {
+                    binding.favoritesText.visibility = View.GONE
+                    binding.favoritesRecyclerView.visibility = View.GONE
+                    binding.allCoinsText.visibility = View.VISIBLE
+                    binding.marketRecyclerView.visibility = View.VISIBLE
                 }
 
             }
@@ -158,8 +184,10 @@ class MarketFragment : Fragment() {
 
             binding.shimmerLayout.stopShimmer()
             binding.shimmerLayout.visibility = View.GONE
-            binding.marketRecyclerView.visibility = View.VISIBLE
-            binding.allCoinsText.visibility = View.VISIBLE
+            if (!isFavoriteSwitchOn) {
+                binding.marketRecyclerView.visibility = View.VISIBLE
+                binding.allCoinsText.visibility = View.VISIBLE
+            }
             binding.progressBar.visibility = View.GONE
             binding.assetExceptionAlert.visibility = View.GONE
 
