@@ -7,12 +7,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.core.view.doOnLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
@@ -75,6 +78,16 @@ class MarketFragment : Fragment() {
         binding.marketRecyclerView.adapter = marketRecyclerAdapter
 
 
+        binding.searchCoinText.setOnQueryTextListener(object : android.widget.SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                marketRecyclerAdapter.filterList(newText ?: "")
+                return true
+            }
+        })
 
         binding.favoritesRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.favoritesRecyclerView.adapter = favoritesRecyclerAdapter
@@ -84,8 +97,6 @@ class MarketFragment : Fragment() {
             binding.allCoinsText.visibility = View.GONE
             binding.favoritesRecyclerView.visibility = View.GONE
             binding.favoritesText.visibility = View.GONE
-            binding.assetExceptionAlert.visibility = View.GONE
-            binding.progressBar.visibility = View.VISIBLE
             viewModel.refreshDataFromAPI()
             binding.swipeRefreshLayout.isRefreshing = false
         }
@@ -94,7 +105,8 @@ class MarketFragment : Fragment() {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 while (isNetworkAvailable(requireContext())) {
                     delay(1000) // 1 saniye bekle
-                    viewModel.refreshDataFromAPI()
+                    if (binding.searchCoinText.query.isNullOrEmpty() || binding.searchCoinText.query.length < 2)
+                        viewModel.refreshDataFromAPI()
                 }
             }
         }
@@ -151,6 +163,8 @@ class MarketFragment : Fragment() {
                     }
                 }
 
+                if (_binding == null) return@addOnSuccessListener // View yoksa geri çık
+
                 favoritesRecyclerAdapter.updateFavoritesList(favoritesList)
 
                 if (favoritesList.isEmpty()) {
@@ -188,21 +202,16 @@ class MarketFragment : Fragment() {
                 binding.marketRecyclerView.visibility = View.VISIBLE
                 binding.allCoinsText.visibility = View.VISIBLE
             }
-            binding.progressBar.visibility = View.GONE
-            binding.assetExceptionAlert.visibility = View.GONE
 
         }
 
 
         viewModel.dataExceptionAlert.observe(viewLifecycleOwner) {
-            if(it && isNetworkAvailable(requireContext())) {
-                binding.assetExceptionAlert.visibility = View.VISIBLE
+            if(it && !isNetworkAvailable(requireContext())) {
+                Toast.makeText(requireContext(),"API limit exceeded, data will be shown from RoomDB",Toast.LENGTH_LONG).show()
                 binding.marketRecyclerView.visibility = View.GONE
-                binding.progressBar.visibility = View.GONE
                 binding.shimmerLayout.stopShimmer()
                 binding.shimmerLayout.visibility = View.GONE
-            } else {
-                binding.assetExceptionAlert.visibility = View.GONE
             }
         }
 
@@ -210,13 +219,8 @@ class MarketFragment : Fragment() {
             if(it) {
                 binding.shimmerLayout.startShimmer()
                 binding.shimmerLayout.visibility = View.VISIBLE
-                binding.progressBar.visibility = View.GONE
                 binding.marketRecyclerView.visibility = View.GONE
-                binding.assetExceptionAlert.visibility = View.GONE
                 binding.allCoinsText.visibility = View.GONE
-
-            } else {
-                binding.progressBar.visibility = View.GONE
             }
         }
 

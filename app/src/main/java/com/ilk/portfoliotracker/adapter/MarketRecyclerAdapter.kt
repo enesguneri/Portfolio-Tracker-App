@@ -18,6 +18,7 @@ class MarketRecyclerAdapter(val assetList : ArrayList<CoinGeckoData>) : Recycler
 
     class MarketViewHolder(val binding : MarketRecyclerRowBinding) : RecyclerView.ViewHolder(binding.root) {
     }
+    private var displayList = ArrayList<CoinGeckoData>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MarketViewHolder {
         val binding = MarketRecyclerRowBinding.inflate(LayoutInflater.from(parent.context),parent,false)
@@ -27,26 +28,41 @@ class MarketRecyclerAdapter(val assetList : ArrayList<CoinGeckoData>) : Recycler
     fun updateAssetList(newList : List<CoinGeckoData>) {
         assetList.clear()
         assetList.addAll(newList)
+        displayList.clear()
+        displayList.addAll(newList)
+        notifyDataSetChanged()
+    }
+
+    fun filterList(query: String) {
+        displayList.clear()
+        if (query.isEmpty() || query.length < 2) {
+            displayList.addAll(assetList)
+        } else {
+            val filteredList = assetList.filter { it.name?.contains(query, ignoreCase = true) == true
+                    || it.symbol?.contains(query, ignoreCase = true) == true
+            }
+            displayList.addAll(filteredList)
+        }
         notifyDataSetChanged()
     }
 
 
     override fun getItemCount(): Int {
-        return assetList.size
+        return displayList.size
     }
 
     override fun onBindViewHolder(holder: MarketViewHolder, position: Int) {
-        holder.binding.assetID.text = assetList[position].name
-        holder.binding.priceAnd24HChangeText.text = "${assetList[position].current_price}"
-        if(assetList[position].price_change_percentage_24h != null && assetList[position].price_change_percentage_24h!! < 0) {
+        holder.binding.assetID.text = displayList[position].name
+        holder.binding.priceAnd24HChangeText.text = "${displayList[position].current_price}"
+        if(displayList[position].price_change_percentage_24h != null && displayList[position].price_change_percentage_24h!! < 0) {
             holder.binding.priceChangeText.setTextColor(holder.itemView.context.resources.getColor(R.color.red))
         } else
             holder.binding.priceChangeText.setTextColor(holder.itemView.context.resources.getColor(R.color.green))
 
-        holder.binding.priceChangeText.text = "%${String.format("%.2f",assetList[position].price_change_percentage_24h)}"
-        holder.binding.marketImageView.downloadImage(assetList[position].image, makePlaceHolder(holder.itemView.context))
+        holder.binding.priceChangeText.text = "%${String.format("%.2f",displayList[position].price_change_percentage_24h)}"
+        holder.binding.marketImageView.downloadImage(displayList[position].image, makePlaceHolder(holder.itemView.context))
         holder.itemView.setOnClickListener {
-            val action = MarketFragmentDirections.actionMarketFragmentToAssetDetailFragment(assetList[position].symbol,false)
+            val action = MarketFragmentDirections.actionMarketFragmentToAssetDetailFragment(displayList[position].symbol,false)
             Navigation.findNavController(it).navigate(action)
         }
     }

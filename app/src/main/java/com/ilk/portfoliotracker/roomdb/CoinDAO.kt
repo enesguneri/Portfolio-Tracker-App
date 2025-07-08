@@ -1,14 +1,14 @@
 package com.ilk.portfoliotracker.roomdb
 
 import androidx.room.Dao
-import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Upsert
 import com.ilk.portfoliotracker.model.CoinGeckoData
 
 @Dao
 interface CoinDAO {
 
-    @Insert
+    @Upsert
     suspend fun insertAll(vararg coin : CoinGeckoData) : List<Long>
 
     @Query("SELECT * FROM coingeckodata")

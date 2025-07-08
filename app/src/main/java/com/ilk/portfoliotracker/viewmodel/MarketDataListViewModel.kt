@@ -1,6 +1,7 @@
 package com.ilk.portfoliotracker.viewmodel
 
 import android.app.Application
+import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -34,6 +35,8 @@ class MarketDataListViewModel(application: Application) : AndroidViewModel(appli
         dataLoading.value = true
         viewModelScope.launch(Dispatchers.IO) {
 
+            try {
+
                 var coinGeckoData =
                     coinGeckoAPIService.getData()//limiti aşmamak için coinGeckoAPI'dan tekrar veri çekilmez.
                 val binanceData =
@@ -43,7 +46,6 @@ class MarketDataListViewModel(application: Application) : AndroidViewModel(appli
                 //    isAvailableOnBinance(it.symbol!!,binanceData) ?: false//sadece binance'de listeli olan coinler gösterilecek şekilde filtrelenir.
                 //}
                 //coinGeckoData = filteredList
-
 
 
                 for (i in coinGeckoData.indices) {
@@ -72,6 +74,10 @@ class MarketDataListViewModel(application: Application) : AndroidViewModel(appli
                 }
                 dataLoaded = true
 
+            }
+            catch (e : Exception){
+                getDataFromRoomDB()
+            }
         }
     }
 
@@ -83,8 +89,9 @@ class MarketDataListViewModel(application: Application) : AndroidViewModel(appli
         }
 
 
-        if(dataExceptionAlert.value == true)
+        if(dataExceptionAlert.value == true) {
             getDataFromRoomDB()
+        }
         else {
             if (savedTime != null && savedTime != 0L && System.nanoTime() - savedTime < priceUpdateTime) {
                 getDataFromRoomDB()
@@ -100,7 +107,6 @@ class MarketDataListViewModel(application: Application) : AndroidViewModel(appli
     }
 
     fun getDataFromRoomDB(){
-        dataLoading.value = true
 
         viewModelScope.launch(Dispatchers.IO) {
             val data = CoinDatabase(getApplication()).CoinDao().getAllCoins()
@@ -130,7 +136,7 @@ class MarketDataListViewModel(application: Application) : AndroidViewModel(appli
 
     fun refreshDataFromAPI() {
 
-        dataLoading.value = false
+        dataLoading.value = false //True olursa sürekli shimmer efekti devreye girer.
         viewModelScope.launch {
             try {
                 if (coinGeckoDataList.value != null && binanceDataList.value != null) {
