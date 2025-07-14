@@ -4,15 +4,12 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.ilk.portfoliotracker.R
 import com.ilk.portfoliotracker.databinding.MarketRecyclerRowBinding
-import com.ilk.portfoliotracker.model.BinanceData
 import com.ilk.portfoliotracker.model.CoinGeckoData
 import com.ilk.portfoliotracker.util.downloadImage
 import com.ilk.portfoliotracker.util.makePlaceHolder
 import com.ilk.portfoliotracker.view.MarketFragmentDirections
-import androidx.navigation.findNavController
 
 class MarketRecyclerAdapter(val assetList : ArrayList<CoinGeckoData>) : RecyclerView.Adapter<MarketRecyclerAdapter.MarketViewHolder>() {
 
@@ -53,7 +50,9 @@ class MarketRecyclerAdapter(val assetList : ArrayList<CoinGeckoData>) : Recycler
 
     override fun onBindViewHolder(holder: MarketViewHolder, position: Int) {
         holder.binding.assetID.text = displayList[position].name
-        holder.binding.priceAnd24HChangeText.text = "${displayList[position].current_price}"
+        holder.binding.priceAnd24HChangeText.text = displayList[position].current_price?.let {
+            formatPrice(it)
+        }
         if(displayList[position].price_change_percentage_24h != null && displayList[position].price_change_percentage_24h!! < 0) {
             holder.binding.priceChangeText.setTextColor(holder.itemView.context.resources.getColor(R.color.red))
         } else
@@ -64,6 +63,18 @@ class MarketRecyclerAdapter(val assetList : ArrayList<CoinGeckoData>) : Recycler
         holder.itemView.setOnClickListener {
             val action = MarketFragmentDirections.actionMarketFragmentToAssetDetailFragment(displayList[position].symbol,false)
             Navigation.findNavController(it).navigate(action)
+        }
+    }
+
+
+    fun formatPrice(price: Double): String {
+        return when {
+            price >= 1 -> String.format("%.2f", price)       // 2 basamak göster
+            price >= 0.01 -> String.format("%.4f", price)     // 4 basamak göster
+            price >= 0.000001 -> String.format("%.8f", price) // çok küçükse 6 basamak
+            price >= 0.00000001 -> String.format("%.10f", price) // çok küçükse 8 basamak
+            price >= 0.0000000001 -> String.format("%.12f", price) // çok küçükse 10 basamak
+            else -> String.format("%.15f",price)
         }
     }
 

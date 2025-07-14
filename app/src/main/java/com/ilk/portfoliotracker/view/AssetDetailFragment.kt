@@ -145,8 +145,8 @@ class AssetDetailFragment : Fragment() {
 
 
                     binding.assetIDText.text = it[assetID].name
-                    binding.priceText.text = "Price: ${it[assetID].current_price.toString()}"
-                    binding.athText.text = "ATH:  ${it[assetID].ath.toString()}"
+                    binding.priceText.text = "Price: ${it[assetID].current_price?.let { it1 -> formatPrice(it1) }}"
+                    binding.athText.text = "ATH:  ${it[assetID].ath?.let { it1 -> formatPrice(it1) }}"
                     binding.athDateText.text =
                         "ATH Date: ${formatDateTimeToDate(it[assetID].ath_date)}"
                     binding.marketRankText.text =
@@ -174,6 +174,17 @@ class AssetDetailFragment : Fragment() {
             }
         }
         return 999
+    }
+
+    fun formatPrice(price: Double): String {
+        return when {
+            price >= 1 -> String.format("%.2f", price)       // 2 basamak göster
+            price >= 0.01 -> String.format("%.4f", price)     // 4 basamak göster
+            price >= 0.000001 -> String.format("%.8f", price) // çok küçükse 6 basamak
+            price >= 0.00000001 -> String.format("%.10f", price) // çok küçükse 8 basamak
+            price >= 0.0000000001 -> String.format("%.12f", price) // çok küçükse 10 basamak
+            else -> String.format("%.15f",price)
+        }
     }
 
 

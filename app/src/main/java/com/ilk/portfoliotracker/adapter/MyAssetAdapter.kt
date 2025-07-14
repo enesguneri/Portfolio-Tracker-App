@@ -45,7 +45,7 @@ class MyAssetAdapter(private val assetList : ArrayList<MyAsset>, private val dat
                 holder.binding.valueText.text = "Current value: $${String.format("%.2f", currentValue)}"
                 holder.binding.amountText.text = "Amount: ${assetList[position].amount.toString()}"
 
-                holder.binding.assetPriceText.text = "Price: $${String.format("%.2f", dataList[coinID].current_price)}"
+                holder.binding.assetPriceText.text = "Price: ${formatPrice(dataList[coinID].current_price!!)}"
 
                 val exactValue = assetList[position].amount * assetList[position].cost
                 holder.binding.investedAmountText.text = "Invested value: $${String.format("%.2f", exactValue)}"
@@ -70,4 +70,17 @@ class MyAssetAdapter(private val assetList : ArrayList<MyAsset>, private val dat
             }
         }
     }
+
+    fun formatPrice(price: Double): String {
+        return when {
+            price >= 1 -> String.format("%.2f", price)       // 2 basamak göster
+            price >= 0.01 -> String.format("%.4f", price)     // 4 basamak göster
+            price >= 0.000001 -> String.format("%.8f", price) // çok küçükse 6 basamak
+            price >= 0.00000001 -> String.format("%.10f", price) // çok küçükse 8 basamak
+            price >= 0.0000000001 -> String.format("%.12f", price) // çok küçükse 10 basamak
+            else -> String.format("%.15f",price)
+        }
+    }
+
+
 }
