@@ -2,7 +2,6 @@ package com.ilk.portfoliotracker.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
 import com.ilk.portfoliotracker.R
 import com.ilk.portfoliotracker.databinding.MyassetRecyclerRowBinding
@@ -11,6 +10,7 @@ import com.ilk.portfoliotracker.model.MyAsset
 import com.ilk.portfoliotracker.util.downloadImage
 import com.ilk.portfoliotracker.util.makePlaceHolder
 import com.ilk.portfoliotracker.view.PortfolioFragmentDirections
+import androidx.navigation.findNavController
 
 class MyAssetAdapter(private val assetList : ArrayList<MyAsset>, private val dataList : ArrayList<CoinGeckoData>) : RecyclerView.Adapter<MyAssetAdapter.AssetHolder>() {
     class AssetHolder(val binding : MyassetRecyclerRowBinding) : RecyclerView.ViewHolder(binding.root) {
@@ -66,7 +66,7 @@ class MyAssetAdapter(private val assetList : ArrayList<MyAsset>, private val dat
         holder.itemView.setOnClickListener {
             if(dataList[coinID!!].name != null) {
                 val action = PortfolioFragmentDirections.actionPortfolioFragmentToMyAssetFragment(dataList[coinID].name!!)
-                Navigation.findNavController(it).navigate(action)
+                it.findNavController().navigate(action)
             }
         }
     }

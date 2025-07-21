@@ -2,7 +2,6 @@ package com.ilk.portfoliotracker.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.google.firebase.Timestamp
 
 @Entity
 data class CoinGeckoData(

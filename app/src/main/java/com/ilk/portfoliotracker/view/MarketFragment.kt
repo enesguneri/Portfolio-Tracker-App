@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.core.view.doOnLayout
 import androidx.fragment.app.Fragment
@@ -15,7 +14,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
@@ -28,7 +26,6 @@ import com.ilk.portfoliotracker.adapter.FavoritesRecyclerAdapter
 import com.ilk.portfoliotracker.adapter.MarketRecyclerAdapter
 import com.ilk.portfoliotracker.databinding.FragmentMarketBinding
 import com.ilk.portfoliotracker.model.CoinGeckoData
-import com.ilk.portfoliotracker.util.PrivateSharedPreferences
 import com.ilk.portfoliotracker.viewmodel.MarketDataListViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -45,7 +42,6 @@ class MarketFragment : Fragment() {
     private val favoritesRecyclerAdapter = FavoritesRecyclerAdapter(arrayListOf())
     private var isFavoriteSwitchOn = false
 
-    private lateinit var privateSharedPreferences : PrivateSharedPreferences
 
     private lateinit var auth: FirebaseAuth
     private lateinit var db : FirebaseFirestore
@@ -67,6 +63,8 @@ class MarketFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.favoritesText.visibility = View.GONE
+        binding.favoritesRecyclerView.visibility = View.GONE
 
         viewModel = ViewModelProvider(this)[MarketDataListViewModel::class.java]
         if (isNetworkAvailable(requireContext()))
@@ -103,10 +101,9 @@ class MarketFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                while (isNetworkAvailable(requireContext())) {
-                    delay(1000) // 1 saniye bekle
-                    if (binding.searchCoinText.query.isNullOrEmpty() || binding.searchCoinText.query.length < 2)
-                        viewModel.refreshDataFromAPI()
+                while (isNetworkAvailable(requireContext()) && (binding.searchCoinText.query.isNullOrEmpty() || binding.searchCoinText.query.length < 2)) {
+                    delay(1000)
+                    viewModel.refreshDataFromAPI()
                 }
             }
         }

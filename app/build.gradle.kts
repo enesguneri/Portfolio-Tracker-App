@@ -3,19 +3,18 @@ plugins {
     alias(libs.plugins.kotlin.android)
 
     id("com.google.gms.google-services")
-    id ("kotlin-kapt")
     id ("androidx.navigation.safeargs.kotlin")
-    id ("com.google.devtools.ksp")
+    id ("com.google.devtools.ksp") version "2.2.0-2.0.2"
 }
 
 android {
     namespace = "com.ilk.portfoliotracker"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.ilk.portfoliotracker"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -75,26 +74,22 @@ dependencies {
     implementation(libs.firebase.storage)
 
 
-    val room_version = "2.6.1"
+    implementation(libs.androidx.room.runtime)
+    annotationProcessor (libs.androidx.room.room.compiler)
+    ksp(libs.androidx.room.room.compiler)
 
-    implementation("androidx.room:room-runtime:$room_version")
-    annotationProcessor ("androidx.room:room-compiler:$room_version")
-    ksp("androidx.room:room-compiler:$room_version")
+    implementation(libs.kotlinx.coroutines.android)
+    implementation (libs.androidx.room.ktx)
 
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
-    implementation ("androidx.room:room-ktx:$room_version")
-    val lifecycle_version = "2.7.0"
+    implementation(libs.androidx.lifecycle.viewmodel.ktx.v270)
+    implementation(libs.androidx.lifecycle.common.java8)
+    implementation(libs.androidx.lifecycle.livedata.ktx.v270)
 
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
-    implementation("androidx.lifecycle:lifecycle-common-java8:$lifecycle_version")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version")
+    implementation (libs.retrofit)
+    implementation (libs.converter.gson)
 
-    val retrofitVersion = "2.8.1"
-    implementation ("com.squareup.retrofit2:retrofit:$retrofitVersion")
-    implementation ("com.squareup.retrofit2:converter-gson:$retrofitVersion")
 
-    val glideVersion = "4.11.0"
-    implementation ("com.github.bumptech.glide:glide:$glideVersion")
+    implementation (libs.glide)
 
     implementation (libs.shimmer)
 }

@@ -19,6 +19,7 @@ import com.google.firebase.ktx.Firebase
 import com.ilk.portfoliotracker.databinding.FragmentAddTokenBinding
 import com.ilk.portfoliotracker.model.CoinGeckoData
 import com.ilk.portfoliotracker.viewmodel.MarketDataListViewModel
+import androidx.navigation.findNavController
 
 class AddTokenFragment : Fragment() {
 
@@ -61,7 +62,7 @@ class AddTokenFragment : Fragment() {
             binding.assetAutoCompleteTextView.threshold = 3
         }
 
-        binding.assetAutoCompleteTextView.setOnItemClickListener { parent, view, position, id ->
+        binding.assetAutoCompleteTextView.setOnItemClickListener { parent, view1, position, id ->
             val selectedItem = parent.getItemAtPosition(position).toString()
             selectedAsset = viewModel.coinGeckoDataList.value!!.find { it.name == selectedItem }!!
 
@@ -85,7 +86,7 @@ class AddTokenFragment : Fragment() {
             auth.currentUser?.let { it1 ->
                 db.collection("CryptoDB").document(it1.uid).collection("Position").add(assetMap).addOnSuccessListener { documentReference ->
                     val action = AddTokenFragmentDirections.actionAddTokenFragmentToPortfolioFragment()
-                    Navigation.findNavController(view).navigate(action)
+                    view.findNavController().navigate(action)
                 }.addOnFailureListener { exception ->
                     Toast.makeText(requireContext(),exception.localizedMessage,Toast.LENGTH_LONG).show()
                 }

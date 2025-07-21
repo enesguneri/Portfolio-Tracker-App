@@ -2,7 +2,6 @@ package com.ilk.portfoliotracker.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
 import com.ilk.portfoliotracker.R
 import com.ilk.portfoliotracker.databinding.MarketRecyclerRowBinding
@@ -10,6 +9,7 @@ import com.ilk.portfoliotracker.model.CoinGeckoData
 import com.ilk.portfoliotracker.util.downloadImage
 import com.ilk.portfoliotracker.util.makePlaceHolder
 import com.ilk.portfoliotracker.view.MarketFragmentDirections
+import androidx.navigation.findNavController
 
 class MarketRecyclerAdapter(val assetList : ArrayList<CoinGeckoData>) : RecyclerView.Adapter<MarketRecyclerAdapter.MarketViewHolder>() {
 
@@ -62,7 +62,7 @@ class MarketRecyclerAdapter(val assetList : ArrayList<CoinGeckoData>) : Recycler
         holder.binding.marketImageView.downloadImage(displayList[position].image, makePlaceHolder(holder.itemView.context))
         holder.itemView.setOnClickListener {
             val action = MarketFragmentDirections.actionMarketFragmentToAssetDetailFragment(displayList[position].symbol,false)
-            Navigation.findNavController(it).navigate(action)
+            it.findNavController().navigate(action)
         }
     }
 
